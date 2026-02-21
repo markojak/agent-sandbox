@@ -73,4 +73,5 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Documentation
 
 - Product overview: [`docs/product-overview.md`](docs/product-overview.md)
+- Testing guide: [`docs/testing.md`](docs/testing.md)
 - Vision source of truth: [`VISION.md`](VISION.md)
