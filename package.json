@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "db:migrate:up": "node scripts/migrate.mjs up",
     "db:migrate:down": "node scripts/migrate.mjs down",
     "db:verify-migrations": "node scripts/verify-migrations.mjs",
@@ -30,6 +31,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.0.18"
   }
 }
