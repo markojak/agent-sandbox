@@ -11,7 +11,7 @@
   **Command:** `DATABASE_URL='postgresql://chiron@localhost:5432/agent_sandbox?schema=public' npm run db:migration:validate`  
   **Validated flow:** apply migration -> seed -> assert fixtures -> reset -> re-apply -> reseed -> re-assert
 
-- [ ] **Schema reviewed and approved by tech lead** *(external gate)*  
+- [ ] **Schema reviewed and approved by tech lead** *(external pending approval; not blockable by code changes in this branch)*  
   **Files for review:** `prisma/schema.prisma`, `prisma/migrations/20260221140000_init_users_profiles/migration.sql`
 
 - [x] **Seed script creates deterministic test users**  
