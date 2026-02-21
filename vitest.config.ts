@@ -1,15 +1,11 @@
-import path from "node:path";
+import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "."),
-    },
-  },
+  plugins: [tsconfigPaths()],
   test: {
     environment: "node",
-    include: ["tests/**/*.spec.ts"],
+    include: ["tests/**/*.spec.ts", "tests/**/*.test.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "lcov"],
