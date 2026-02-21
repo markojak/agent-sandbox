@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test tests/**/*.test.ts",
+    "test": "vitest run",
     "env:check": "tsx scripts/check-env.ts",
     "migrate:check": "node scripts/migrate-check.mjs",
     "migrate:deploy": "node scripts/migrate-deploy.mjs"
@@ -26,6 +26,8 @@
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
     "tsx": "^4.20.6",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.0.18"
   }
 }

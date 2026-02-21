@@ -1,8 +1,8 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { afterAll, describe, expect, it } from "vitest";
+
 import { GET } from "@/app/api/health/route";
 
-const ORIGINAL_ENV = { ...process.env };
+const originalEnv = { ...process.env };
 
 function setValidEnv() {
   process.env.APP_ENV = "staging";
@@ -11,28 +11,30 @@ function setValidEnv() {
   process.env.LOG_INGEST_TOKEN = "1234567890123456";
 }
 
-test("health endpoint returns 200 when environment is valid", async () => {
-  setValidEnv();
+describe("health endpoint", () => {
+  it("returns 200 when environment is valid", async () => {
+    setValidEnv();
 
-  const response = await GET();
-  const body = (await response.json()) as { status: string };
+    const response = await GET();
+    const body = (await response.json()) as { status: string };
 
-  assert.equal(response.status, 200);
-  assert.equal(body.status, "ok");
+    expect(response.status).toBe(200);
+    expect(body.status).toBe("ok");
+  });
+
+  it("returns 503 when environment is invalid", async () => {
+    setValidEnv();
+    delete process.env.AUTH_SECRET;
+
+    const response = await GET();
+    const body = (await response.json()) as { status: string; checks: string[] };
+
+    expect(response.status).toBe(503);
+    expect(body.status).toBe("degraded");
+    expect(body.checks.join("\n")).toMatch(/AUTH_SECRET/);
+  });
 });
 
-test("health endpoint returns 503 when environment is invalid", async () => {
-  setValidEnv();
-  delete process.env.AUTH_SECRET;
-
-  const response = await GET();
-  const body = (await response.json()) as { status: string; checks: string[] };
-
-  assert.equal(response.status, 503);
-  assert.equal(body.status, "degraded");
-  assert.match(body.checks.join("\n"), /AUTH_SECRET/);
-});
-
-test.after(() => {
-  process.env = ORIGINAL_ENV;
+afterAll(() => {
+  process.env = originalEnv;
 });

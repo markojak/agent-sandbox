@@ -1,35 +1,37 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { describe, expect, it } from "vitest";
+
 import { InMemoryRateLimiter } from "@/lib/rate-limit";
 
-test("allows requests within the configured limit", () => {
-  const limiter = new InMemoryRateLimiter(2, 1_000);
+describe("in-memory rate limiter", () => {
+  it("allows requests within the configured limit", () => {
+    const limiter = new InMemoryRateLimiter(2, 1_000);
 
-  const first = limiter.consume("ip-1", 1_000);
-  const second = limiter.consume("ip-1", 1_100);
+    const first = limiter.consume("ip-1", 1_000);
+    const second = limiter.consume("ip-1", 1_100);
 
-  assert.equal(first.allowed, true);
-  assert.equal(second.allowed, true);
-  assert.equal(second.remaining, 0);
-});
+    expect(first.allowed).toBe(true);
+    expect(second.allowed).toBe(true);
+    expect(second.remaining).toBe(0);
+  });
 
-test("blocks requests above the limit in the same window", () => {
-  const limiter = new InMemoryRateLimiter(2, 1_000);
+  it("blocks requests above the limit in the same window", () => {
+    const limiter = new InMemoryRateLimiter(2, 1_000);
 
-  limiter.consume("ip-1", 1_000);
-  limiter.consume("ip-1", 1_100);
-  const third = limiter.consume("ip-1", 1_200);
+    limiter.consume("ip-1", 1_000);
+    limiter.consume("ip-1", 1_100);
+    const third = limiter.consume("ip-1", 1_200);
 
-  assert.equal(third.allowed, false);
-  assert.equal(third.remaining, 0);
-});
+    expect(third.allowed).toBe(false);
+    expect(third.remaining).toBe(0);
+  });
 
-test("resets counters after the window elapses", () => {
-  const limiter = new InMemoryRateLimiter(1, 1_000);
+  it("resets counters after the window elapses", () => {
+    const limiter = new InMemoryRateLimiter(1, 1_000);
 
-  limiter.consume("ip-1", 1_000);
-  const second = limiter.consume("ip-1", 2_001);
+    limiter.consume("ip-1", 1_000);
+    const second = limiter.consume("ip-1", 2_001);
 
-  assert.equal(second.allowed, true);
-  assert.equal(second.remaining, 0);
+    expect(second.allowed).toBe(true);
+    expect(second.remaining).toBe(0);
+  });
 });
