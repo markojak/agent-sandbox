@@ -11,8 +11,8 @@
     "db:migrate:up": "node scripts/migrate.mjs up",
     "db:migrate:down": "node scripts/migrate.mjs down",
     "db:verify-migrations": "node scripts/verify-migrations.mjs",
-    "test:unit": "node --test tests/unit/**/*.test.mjs",
-    "test:integration": "node --test tests/integration/**/*.test.mjs",
+    "test:unit": "node --test tests/unit/*.test.mjs",
+    "test:integration": "node --test tests/integration/*.test.mjs",
     "test:e2e": "node tests/e2e/auth-profile-smoke.mjs",
     "test:perf": "node tests/perf/auth-profile-p95.mjs"
   },
