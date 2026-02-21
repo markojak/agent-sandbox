@@ -73,4 +73,5 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Documentation
 
 - Product overview: [`docs/product-overview.md`](docs/product-overview.md)
+- Observability runbook: [`docs/observability-runbook.md`](docs/observability-runbook.md)
 - Vision source of truth: [`VISION.md`](VISION.md)
