@@ -16,11 +16,19 @@
     "db:migrate:reset": "prisma migrate reset --force",
     "db:seed": "prisma db seed",
     "db:migration:validate": "node scripts/validate-migration-gate.mjs",
-    "db:migration:validate:local": "node --env-file=.env scripts/validate-migration-gate.mjs"
+    "db:migration:validate:local": "node --env-file=.env scripts/validate-migration-gate.mjs",
+    "db:migrate:up": "node scripts/migrate.mjs up",
+    "db:migrate:down": "node scripts/migrate.mjs down",
+    "db:verify-migrations": "node scripts/verify-migrations.mjs",
+    "test:unit": "node --test tests/unit/*.test.mjs",
+    "test:integration": "node --test tests/integration/*.test.mjs",
+    "test:e2e": "node tests/e2e/auth-profile-smoke.mjs",
+    "test:perf": "node tests/perf/auth-profile-p95.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
     "next": "16.1.6",
+    "pg": "^8.16.3",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
