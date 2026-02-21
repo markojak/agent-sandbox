@@ -31,10 +31,28 @@
 
 ## Quality checks
 
-Run all required checks before opening a PR:
+Run the baseline quality gate before opening a PR:
 
 ```bash
-npm run lint
-npm run typecheck
-npm test
+npm run check
 ```
+
+This command runs:
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm test`
+
+## Clean clone validation
+
+From a fresh clone, the baseline readiness verification is:
+
+```bash
+npm ci
+cp .env.example .env.local
+npm run check
+```
+
+## Branch protection requirement
+
+The `CI / checks` workflow must be configured as a required status check for `main` in GitHub branch protection settings.
