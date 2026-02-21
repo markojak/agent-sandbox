@@ -1,0 +1,74 @@
+name: Deploy
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  staging-preview:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: staging
+      AUTH_SECRET: 12345678901234567890123456789012
+      DATABASE_URL: postgresql://user:pass@localhost:5432/db
+      LOG_INGEST_TOKEN: 1234567890123456
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Pre-deploy checks
+        run: |
+          npm run env:check
+          npm run lint
+          npm run test
+          npm run build
+          npm run migrate:check -- --dry-run
+
+      - name: Staging deployment dry-run
+        run: echo "Staging deployment preview checks passed."
+
+  production:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      APP_ENV: production
+      AUTH_SECRET: 12345678901234567890123456789012
+      DATABASE_URL: postgresql://user:pass@localhost:5432/db
+      LOG_INGEST_TOKEN: 1234567890123456
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Production promotion preflight
+        run: |
+          npm run env:check
+          npm run lint
+          npm run test
+          npm run build
+          npm run migrate:check -- --dry-run
+
+      - name: Apply migrations
+        run: npm run migrate:deploy
+
+      - name: Deploy production
+        run: echo "Replace with provider-specific production deploy command."
