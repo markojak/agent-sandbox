@@ -65,10 +65,24 @@ The MVP is designed to deliver core daily tracking value quickly.
 
 ```bash
 npm install
+cp .env.example .env.local
+npm run db:migrate:up
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+## Quality Gates (M1 auth/profile)
+
+```bash
+npm run lint
+npm run typecheck
+npm run test:unit
+npm run test:integration
+npm run db:verify-migrations
+npm run test:e2e
+npm run test:perf
+```
 
 ## Deployment hardening (MVP)
 
@@ -84,4 +98,6 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Documentation
 
 - Product overview: [`docs/product-overview.md`](docs/product-overview.md)
+- Observability queries: [`docs/auth-profile-observability.md`](docs/auth-profile-observability.md)
+- M1 release checklist: [`docs/m1-release-checklist.md`](docs/m1-release-checklist.md)
 - Vision source of truth: [`VISION.md`](VISION.md)

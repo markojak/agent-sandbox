@@ -7,13 +7,22 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "env:check": "tsx scripts/check-env.ts",
     "migrate:check": "node scripts/migrate-check.mjs",
-    "migrate:deploy": "node scripts/migrate-deploy.mjs"
+    "migrate:deploy": "node scripts/migrate-deploy.mjs",
+    "db:migrate:up": "node scripts/migrate.mjs up",
+    "db:migrate:down": "node scripts/migrate.mjs down",
+    "db:verify-migrations": "node scripts/verify-migrations.mjs",
+    "test:unit": "node --test tests/unit/*.test.mjs",
+    "test:integration": "node --test tests/integration/*.test.mjs",
+    "test:e2e": "node tests/e2e/auth-profile-smoke.mjs",
+    "test:perf": "node tests/perf/auth-profile-p95.mjs"
   },
   "dependencies": {
     "next": "16.1.6",
+    "pg": "^8.16.3",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
