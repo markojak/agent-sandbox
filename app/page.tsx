@@ -17,6 +17,9 @@ export default async function Home() {
             <Link className="text-blue-600 underline" href="/profile">
               Go to profile settings
             </Link>
+            <Link className="text-blue-600 underline" href="/timeline">
+              Open calorie timeline
+            </Link>
             <Link className="text-blue-600 underline" href="/reuse">
               Open meal reuse MVP demo
             </Link>

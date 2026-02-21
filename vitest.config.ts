@@ -5,6 +5,8 @@ export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
     environment: "node",
-    include: ["tests/**/*.test.ts"],
+    environmentMatchGlobs: [["components/**/*.test.tsx", "jsdom"]],
+    setupFiles: ["./vitest.setup.ts"],
+    include: ["**/*.test.ts", "**/*.test.tsx"],
   },
 });

@@ -1,0 +1,81 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`TrendChart > renders empty state when no points have entries 1`] = `
+<section
+  aria-label="7-day trend-empty"
+  class="rounded-xl border border-dashed border-zinc-300 bg-zinc-50 p-4"
+>
+  <h3
+    class="font-medium text-zinc-700"
+  >
+    7-day trend
+  </h3>
+  <p
+    class="mt-2 text-sm text-zinc-500"
+  >
+    No logs yet. Add a meal to see your calorie trend.
+  </p>
+</section>
+`;
+
+exports[`TrendChart > renders sparse trend and exposes tooltip labels 1`] = `
+<section
+  aria-label="7-day trend"
+  class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm"
+>
+  <h3
+    class="font-medium text-zinc-800"
+  >
+    7-day trend
+  </h3>
+  <div
+    class="mt-4 flex h-36 items-end gap-2"
+  >
+    <div
+      class="flex flex-1 flex-col items-center gap-1"
+    >
+      <div
+        aria-label="Mar 1: 1600 kcal"
+        class="w-full rounded-sm bg-blue-500"
+        style="height: 76.19047619047619%;"
+        title="Mar 1: 1600 kcal"
+      />
+      <span
+        class="text-[10px] text-zinc-500"
+      >
+        Mar 1
+      </span>
+    </div>
+    <div
+      class="flex flex-1 flex-col items-center gap-1"
+    >
+      <div
+        aria-label="Mar 2: 0 kcal"
+        class="w-full rounded-sm bg-zinc-200"
+        style="height: 3%;"
+        title="Mar 2: 0 kcal"
+      />
+      <span
+        class="text-[10px] text-zinc-500"
+      >
+        Mar 2
+      </span>
+    </div>
+    <div
+      class="flex flex-1 flex-col items-center gap-1"
+    >
+      <div
+        aria-label="Mar 3: 2100 kcal"
+        class="w-full rounded-sm bg-blue-500"
+        style="height: 100%;"
+        title="Mar 3: 2100 kcal"
+      />
+      <span
+        class="text-[10px] text-zinc-500"
+      >
+        Mar 3
+      </span>
+    </div>
+  </div>
+</section>
+`;

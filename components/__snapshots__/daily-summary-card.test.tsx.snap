@@ -1,0 +1,75 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`DailySummaryCard > renders over-goal state 1`] = `
+<section
+  aria-label="daily-summary"
+  class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm"
+>
+  <p
+    class="text-sm text-zinc-500"
+  >
+    Mar 20
+  </p>
+  <p
+    class="mt-2 text-3xl font-semibold text-zinc-900"
+  >
+    2500
+     kcal
+  </p>
+  <p
+    class="text-sm text-zinc-500"
+  >
+    Goal: 
+    2200
+     kcal
+  </p>
+  <p
+    class="mt-2 text-sm font-medium text-red-600"
+  >
+    300 kcal over goal
+  </p>
+  <p
+    class="mt-2 text-xs text-zinc-500"
+  >
+    4
+     entries logged
+  </p>
+</section>
+`;
+
+exports[`DailySummaryCard > renders remaining state 1`] = `
+<section
+  aria-label="daily-summary"
+  class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm"
+>
+  <p
+    class="text-sm text-zinc-500"
+  >
+    Mar 20
+  </p>
+  <p
+    class="mt-2 text-3xl font-semibold text-zinc-900"
+  >
+    1800
+     kcal
+  </p>
+  <p
+    class="text-sm text-zinc-500"
+  >
+    Goal: 
+    2200
+     kcal
+  </p>
+  <p
+    class="mt-2 text-sm font-medium text-emerald-600"
+  >
+    400 kcal remaining
+  </p>
+  <p
+    class="mt-2 text-xs text-zinc-500"
+  >
+    3
+     entries logged
+  </p>
+</section>
+`;
