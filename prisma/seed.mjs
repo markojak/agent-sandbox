@@ -1,40 +1,10 @@
 import { PrismaClient } from "@prisma/client";
+import { seedFixtures } from "./seed-fixtures.mjs";
 
 const prisma = new PrismaClient();
 
-const fixtures = [
-  {
-    user: {
-      id: "usr_demo_alex",
-      email: "alex@example.com",
-      passwordHash: "$2b$10$fixturehashalexxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    },
-    profile: {
-      id: "prf_demo_alex",
-      displayName: "Alex Demo",
-      timezone: "America/Chicago",
-      unitSystem: "imperial",
-      calorieGoal: 2200,
-    },
-  },
-  {
-    user: {
-      id: "usr_demo_sam",
-      email: "sam@example.com",
-      passwordHash: "$2b$10$fixturehashsamxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    },
-    profile: {
-      id: "prf_demo_sam",
-      displayName: "Sam Demo",
-      timezone: "UTC",
-      unitSystem: "metric",
-      calorieGoal: 1900,
-    },
-  },
-];
-
 async function main() {
-  for (const fixture of fixtures) {
+  for (const fixture of seedFixtures) {
     await prisma.user.upsert({
       where: { id: fixture.user.id },
       create: {
@@ -65,7 +35,7 @@ async function main() {
     });
   }
 
-  console.log(`Seeded ${fixtures.length} deterministic users and profiles.`);
+  console.log(`Seeded ${seedFixtures.length} deterministic users and profiles.`);
 }
 
 main()

@@ -33,8 +33,20 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
    ```
 4. Validate the migration gate (apply -> reset -> reapply + fixture assertions):
    ```bash
-   npm run db:migration:validate
+   npm run db:migration:validate:local
    ```
+
+### Validation commands
+
+```bash
+npm run lint
+npm run typecheck
+npm run test
+npm run validate          # lint + typecheck + test
+npm run validate:with-db  # includes migration gate
+```
+
+Acceptance-criteria mapping and evidence: `docs/issue-9-acceptance.md`
 
 ## Learn More
 

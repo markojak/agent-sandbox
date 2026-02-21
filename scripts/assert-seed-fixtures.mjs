@@ -1,29 +1,18 @@
 import { PrismaClient } from "@prisma/client";
+import { seedFixtures } from "../prisma/seed-fixtures.mjs";
 
 const prisma = new PrismaClient();
 
-const expected = [
-  {
-    id: "usr_demo_alex",
-    email: "alex@example.com",
-    profile: {
-      id: "prf_demo_alex",
-      timezone: "America/Chicago",
-      unitSystem: "imperial",
-      calorieGoal: 2200,
-    },
+const expected = seedFixtures.map((fixture) => ({
+  id: fixture.user.id,
+  email: fixture.user.email,
+  profile: {
+    id: fixture.profile.id,
+    timezone: fixture.profile.timezone,
+    unitSystem: fixture.profile.unitSystem,
+    calorieGoal: fixture.profile.calorieGoal,
   },
-  {
-    id: "usr_demo_sam",
-    email: "sam@example.com",
-    profile: {
-      id: "prf_demo_sam",
-      timezone: "UTC",
-      unitSystem: "metric",
-      calorieGoal: 1900,
-    },
-  },
-];
+}));
 
 async function main() {
   const users = await prisma.user.findMany({
