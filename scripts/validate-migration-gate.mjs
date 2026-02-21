@@ -1,6 +1,6 @@
 import { execSync } from "node:child_process";
 
-const required = ["DATABASE_URL", "SHADOW_DATABASE_URL"];
+const required = ["DATABASE_URL"];
 const missing = required.filter((key) => !process.env[key]);
 
 if (missing.length > 0) {

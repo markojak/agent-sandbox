@@ -78,7 +78,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Database foundations (M1-B)
 
-1. Copy `.env.example` to `.env` and point both URLs to local Postgres databases.
+1. Copy `.env.example` to `.env` and point `DATABASE_URL` to a local Postgres database.
 2. Apply migrations:
    ```bash
    npm run db:migrate:deploy
