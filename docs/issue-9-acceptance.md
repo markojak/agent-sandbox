@@ -54,3 +54,17 @@ npm run db:migration:validate
 - `npm run typecheck` ✅
 - `npm run test` ✅ (1/1 pass: deterministic seed fixture test)
 - `DATABASE_URL='postgresql://chiron@localhost:5432/agent_sandbox?schema=public' npm run db:migration:validate` ✅
+
+## Revalidation after SHARD_REVIEW: CHANGES_REQUESTED
+
+Re-ran on current branch after feedback:
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+- `npm run test` ✅
+- `DATABASE_URL='postgresql://chiron@localhost:5432/agent_sandbox?schema=public' npm run db:migration:validate` ✅
+
+Notable gate output checkpoints:
+- seed executed twice successfully (`Seeded 2 deterministic users and profiles.`)
+- fixture assertions passed twice (`Seed fixtures are deterministic and valid.`)
+- reset + reapply path passed (`Migration gate validation passed ...`)
