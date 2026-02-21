@@ -6,9 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "DATABASE_URL='file:./dev.db' prisma migrate deploy",
+    "test": "DATABASE_URL='file:./test.db' prisma db push --force-reset && DATABASE_URL='file:./test.db' vitest run"
   },
   "dependencies": {
+    "@prisma/client": "^6.16.2",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"
@@ -20,7 +24,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "prisma": "^6.16.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.0.18"
   }
 }

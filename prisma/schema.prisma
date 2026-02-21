@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model FoodEntry {
+  id             String   @id @default(cuid())
+  mealName       String
+  calories       Int
+  quantity       Float
+  mealTime       DateTime
+  notes          String?
+  idempotencyKey String?  @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([mealTime])
+}
