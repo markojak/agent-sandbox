@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { validateFoodEntryPayload } from "@/lib/core/food-entry";
-import { getUserIdFromAuthHeader } from "@/lib/server/auth";
+import { getUserIdFromAuthHeader } from "@/lib/server/auth-header";
 import { createFoodEntry, listFoodEntries } from "@/lib/server/food-entry-store";
 
 function unauthorized() {

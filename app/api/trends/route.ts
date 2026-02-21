@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { calculateAdherenceScore, calculateLoggingStreak } from "@/lib/core/adherence";
 import { buildDailyTotals, calculateRollingAverage, dayKey } from "@/lib/core/metrics";
-import { getUserIdFromAuthHeader } from "@/lib/server/auth";
+import { getUserIdFromAuthHeader } from "@/lib/server/auth-header";
 import { listFoodEntries } from "@/lib/server/food-entry-store";
 
 export async function GET(request: Request) {

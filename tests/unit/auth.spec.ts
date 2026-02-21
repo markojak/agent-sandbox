@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getUserIdFromAuthHeader } from "@/lib/server/auth";
+import { getUserIdFromAuthHeader } from "@/lib/server/auth-header";
 
 describe("auth header parsing", () => {
   it("returns null without header", () => {
