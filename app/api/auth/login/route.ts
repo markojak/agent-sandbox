@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
 import { login } from "@/lib/server/auth-profile-service.mjs";
+import { withObservedRoute } from "@/lib/observability/route";
 
-export async function POST(request: Request) {
+export const POST = withObservedRoute(async (request) => {
   const body = await request.json();
   const result = await login(body);
 
-  return NextResponse.json(result.body, { status: result.status });
-}
+  return Response.json(result.body, { status: result.status });
+});

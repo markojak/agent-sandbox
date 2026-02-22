@@ -3,7 +3,7 @@
 ## What is instrumented
 
 ### Structured API request logs
-Every API route wrapped with `withObservedRoute(...)` emits an `api_request` JSON log with:
+Core MVP API routes are wrapped with `withObservedRoute(...)` and emit an `api_request` JSON log with:
 - `requestId` (correlation id)
 - `userIdHash` (salted SHA-256 hash from `x-user-id` header)
 - `method`
@@ -11,6 +11,12 @@ Every API route wrapped with `withObservedRoute(...)` emits an `api_request` JSO
 - `status`
 - `latencyMs`
 - `env` + `release`
+
+Current core coverage:
+- `POST /api/auth/login`
+- `POST /api/auth/signup`
+- `PATCH /api/profile`
+- `POST /api/logs`
 
 ### Error tracking
 Unhandled route exceptions are captured through `captureError(...)` with:
