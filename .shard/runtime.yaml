@@ -1,0 +1,17 @@
+version: 1
+taskManager:
+  provider: github
+  github:
+    remote: origin
+    repository: markojak/agent-sandbox
+  linear: {}
+orchestrator:
+  mode: auto
+  policy:
+    maxActiveCodingWorkers: 3
+    maxOpenPrs: 3
+    mergeBudgetPerTick: 1
+    conflictRatioPauseThreshold: 0.5
+    autoMergeMode: yolo
+createdAt: 2026-02-22T22:12:53.446Z
+updatedAt: 2026-02-22T22:12:58.341Z

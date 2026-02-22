@@ -1,0 +1,11 @@
+version: 1
+taskManager:
+  provider: github
+orchestrator:
+  mode: human_approved
+  policy:
+    maxActiveCodingWorkers: 1
+    maxOpenPrs: 1
+    mergeBudgetPerTick: 1
+    conflictRatioPauseThreshold: 0.5
+    autoMergeMode: off
