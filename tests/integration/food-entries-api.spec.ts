@@ -86,6 +86,58 @@ describe("food entry API", () => {
     expect(createResponse.status).toBe(400);
   });
 
+  it("enforces idempotency key conflict behavior", async () => {
+    const idempotencyHeaders = {
+      ...authHeader,
+      "idempotency-key": "meal-123",
+    };
+
+    const firstResponse = await POST(
+      new Request(`${baseUrl}/api/food-entries`, {
+        method: "POST",
+        headers: idempotencyHeaders,
+        body: JSON.stringify({
+          name: "Repeat meal",
+          calories: 450,
+          consumedAt: "2026-02-21T11:00:00.000Z",
+        }),
+      }),
+    );
+
+    expect(firstResponse.status).toBe(201);
+    const firstEntry = (await firstResponse.json()).data;
+
+    const replayResponse = await POST(
+      new Request(`${baseUrl}/api/food-entries`, {
+        method: "POST",
+        headers: idempotencyHeaders,
+        body: JSON.stringify({
+          name: "Repeat meal",
+          calories: 450,
+          consumedAt: "2026-02-21T11:00:00.000Z",
+        }),
+      }),
+    );
+
+    expect(replayResponse.status).toBe(200);
+    const replayEntry = (await replayResponse.json()).data;
+    expect(replayEntry.id).toBe(firstEntry.id);
+
+    const conflictResponse = await POST(
+      new Request(`${baseUrl}/api/food-entries`, {
+        method: "POST",
+        headers: idempotencyHeaders,
+        body: JSON.stringify({
+          name: "Repeat meal",
+          calories: 999,
+          consumedAt: "2026-02-21T11:00:00.000Z",
+        }),
+      }),
+    );
+
+    expect(conflictResponse.status).toBe(409);
+  });
+
   it("guards patch and delete with ownership + not-found checks", async () => {
     const createResponse = await POST(
       new Request(`${baseUrl}/api/food-entries`, {

@@ -13,9 +13,14 @@ export default async function Home() {
       {user ? (
         <div className="rounded border border-zinc-200 p-4">
           <p className="mb-3 text-sm text-zinc-600">Signed in as {user.email}</p>
-          <Link className="text-blue-600 underline" href="/profile">
-            Go to profile settings
-          </Link>
+          <div className="flex flex-wrap gap-4">
+            <Link className="text-blue-600 underline" href="/profile">
+              Go to profile settings
+            </Link>
+            <Link className="text-blue-600 underline" href="/reuse">
+              Open meal reuse MVP demo
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="rounded border border-zinc-200 p-4">

@@ -9,7 +9,17 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "lcov"],
-      include: ["lib/core/**/*.ts", "lib/server/**/*.ts", "app/api/**/*.ts"],
+      include: [
+        "lib/core/**/*.ts",
+        "lib/server/auth-header.ts",
+        "lib/server/food-entry-store.ts",
+        "app/api/food-entries/**/*.ts",
+        "app/api/trends/**/*.ts",
+        "app/api/entries/**/*.ts",
+        "app/api/favorites/**/*.ts",
+        "app/api/recents/**/*.ts",
+        "app/api/telemetry/**/*.ts",
+      ],
       thresholds: {
         statements: 80,
         branches: 80,

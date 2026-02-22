@@ -13,12 +13,22 @@
 
 ## Local Commands
 
+### MVP test pyramid (Vitest)
+
 ```bash
 npm run test
+npm run test:unit:vitest
+npm run test:integration:vitest
+npm run test:e2e:vitest
+npm run test:coverage
+```
+
+### Auth/profile legacy gates (Node test runner)
+
+```bash
 npm run test:unit
 npm run test:integration
 npm run test:e2e
-npm run test:coverage
 ```
 
 ## Coverage / Quality Gates
