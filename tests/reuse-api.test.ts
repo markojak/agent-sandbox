@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { DELETE as deleteFavorite } from "@/app/api/favorites/[favoriteId]/route";
-import { GET as getEntries, POST as postEntries } from "@/app/api/entries/route";
 import { POST as postDuplicate } from "@/app/api/entries/[entryId]/duplicate/route";
+import { GET as getEntries, POST as postEntries } from "@/app/api/entries/route";
+import { DELETE as deleteFavorite } from "@/app/api/favorites/[favoriteId]/route";
 import { GET as getFavorites, POST as postFavorites } from "@/app/api/favorites/route";
 import { GET as getRecents } from "@/app/api/recents/route";
 import { GET as getTelemetry } from "@/app/api/telemetry/route";
@@ -20,51 +20,68 @@ const req = (url: string, userId: string, init?: RequestInit) =>
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const assertDefined = <T>(value: T | undefined): T => {
+  expect(value).toBeDefined();
+  return value as T;
+};
+
 describe("favorites, recents, and duplicate flow APIs", () => {
   beforeEach(() => {
     resetStore();
   });
 
   it("favorites CRUD is user-scoped and blocks cross-user access", async () => {
-    const entryResponse = await postEntries(
-      req("http://localhost/api/entries", "user-a", {
-        method: "POST",
-        body: JSON.stringify({
-          mealName: "Chicken bowl",
-          calories: 700,
-          quantity: "1 bowl",
-          mealTime: "lunch",
+    const entryResponse = assertDefined(
+      await postEntries(
+        req("http://localhost/api/entries", "user-a", {
+          method: "POST",
+          body: JSON.stringify({
+            mealName: "Chicken bowl",
+            calories: 700,
+            quantity: "1 bowl",
+            mealTime: "lunch",
+          }),
         }),
-      }),
+      ),
     );
     expect(entryResponse.status).toBe(201);
     const createdEntry = (await entryResponse.json()).entry;
 
-    const favoriteResponse = await postFavorites(
-      req("http://localhost/api/favorites", "user-a", {
-        method: "POST",
-        body: JSON.stringify({ entryId: createdEntry.id }),
-      }),
+    const favoriteResponse = assertDefined(
+      await postFavorites(
+        req("http://localhost/api/favorites", "user-a", {
+          method: "POST",
+          body: JSON.stringify({ entryId: createdEntry.id }),
+        }),
+      ),
     );
     expect(favoriteResponse.status).toBe(201);
     const createdFavorite = (await favoriteResponse.json()).favorite;
 
-    const userAFavorites = await getFavorites(req("http://localhost/api/favorites", "user-a"));
+    const userAFavorites = assertDefined(
+      await getFavorites(req("http://localhost/api/favorites", "user-a")),
+    );
     expect(userAFavorites.status).toBe(200);
     expect((await userAFavorites.json()).favorites.length).toBe(1);
 
-    const userBFavorites = await getFavorites(req("http://localhost/api/favorites", "user-b"));
+    const userBFavorites = assertDefined(
+      await getFavorites(req("http://localhost/api/favorites", "user-b")),
+    );
     expect(userBFavorites.status).toBe(200);
     expect((await userBFavorites.json()).favorites.length).toBe(0);
 
-    const crossUserDelete = await deleteFavorite(req("http://localhost/api/favorites/id", "user-b"), {
-      params: Promise.resolve({ favoriteId: createdFavorite.id }),
-    });
+    const crossUserDelete = assertDefined(
+      await deleteFavorite(req("http://localhost/api/favorites/id", "user-b"), {
+        params: Promise.resolve({ favoriteId: createdFavorite.id }),
+      }),
+    );
     expect(crossUserDelete.status).toBe(404);
 
-    const ownerDelete = await deleteFavorite(req("http://localhost/api/favorites/id", "user-a"), {
-      params: Promise.resolve({ favoriteId: createdFavorite.id }),
-    });
+    const ownerDelete = assertDefined(
+      await deleteFavorite(req("http://localhost/api/favorites/id", "user-a"), {
+        params: Promise.resolve({ favoriteId: createdFavorite.id }),
+      }),
+    );
     expect(ownerDelete.status).toBe(204);
   });
 
@@ -109,7 +126,7 @@ describe("favorites, recents, and duplicate flow APIs", () => {
       }),
     );
 
-    const recentsResponse = await getRecents(req("http://localhost/api/recents", "user-a"));
+    const recentsResponse = assertDefined(await getRecents(req("http://localhost/api/recents", "user-a")));
     expect(recentsResponse.status).toBe(200);
 
     const recents = (await recentsResponse.json()).recents;
@@ -119,24 +136,28 @@ describe("favorites, recents, and duplicate flow APIs", () => {
   });
 
   it("reuse actions emit telemetry events for favorite/recent/duplicate", async () => {
-    const entryResponse = await postEntries(
-      req("http://localhost/api/entries", "user-a", {
-        method: "POST",
-        body: JSON.stringify({
-          mealName: "Turkey wrap",
-          calories: 540,
-          quantity: "1 wrap",
-          mealTime: "lunch",
+    const entryResponse = assertDefined(
+      await postEntries(
+        req("http://localhost/api/entries", "user-a", {
+          method: "POST",
+          body: JSON.stringify({
+            mealName: "Turkey wrap",
+            calories: 540,
+            quantity: "1 wrap",
+            mealTime: "lunch",
+          }),
         }),
-      }),
+      ),
     );
     const sourceEntry = (await entryResponse.json()).entry;
 
-    const favoriteResponse = await postFavorites(
-      req("http://localhost/api/favorites", "user-a", {
-        method: "POST",
-        body: JSON.stringify({ entryId: sourceEntry.id }),
-      }),
+    const favoriteResponse = assertDefined(
+      await postFavorites(
+        req("http://localhost/api/favorites", "user-a", {
+          method: "POST",
+          body: JSON.stringify({ entryId: sourceEntry.id }),
+        }),
+      ),
     );
     const favorite = (await favoriteResponse.json()).favorite;
 
@@ -166,21 +187,15 @@ describe("favorites, recents, and duplicate flow APIs", () => {
       }),
     );
 
-    await postDuplicate(
-      req("http://localhost/api/entries/dup", "user-a", { method: "POST" }),
-      {
-        params: Promise.resolve({ entryId: sourceEntry.id }),
-      },
-    );
+    await postDuplicate(req("http://localhost/api/entries/dup", "user-a", { method: "POST" }), {
+      params: Promise.resolve({ entryId: sourceEntry.id }),
+    });
 
-    await deleteFavorite(
-      req("http://localhost/api/favorites/id", "user-a", { method: "DELETE" }),
-      {
-        params: Promise.resolve({ favoriteId: favorite.id }),
-      },
-    );
+    await deleteFavorite(req("http://localhost/api/favorites/id", "user-a", { method: "DELETE" }), {
+      params: Promise.resolve({ favoriteId: favorite.id }),
+    });
 
-    const telemetryResponse = await getTelemetry(req("http://localhost/api/telemetry", "user-a"));
+    const telemetryResponse = assertDefined(await getTelemetry(req("http://localhost/api/telemetry", "user-a")));
     const events = (await telemetryResponse.json()).events.map((event: { type: string }) => event.type);
 
     expect(events).toContain("favorite_added");
@@ -191,7 +206,7 @@ describe("favorites, recents, and duplicate flow APIs", () => {
   });
 
   it("all APIs require authenticated user header", async () => {
-    const response = await getEntries(new Request("http://localhost/api/entries"));
+    const response = assertDefined(await getEntries(new Request("http://localhost/api/entries")));
     expect(response.status).toBe(401);
   });
 });
