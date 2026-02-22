@@ -14,7 +14,7 @@ import { PATCH as profilePatch } from "@/app/api/profile/route";
 import { login, signup, updateProfile } from "@/lib/server/auth-profile-service.mjs";
 
 function getLoggedEvents(spy: ReturnType<typeof vi.spyOn>): Array<{ event: string; payload: Record<string, unknown> }> {
-  return spy.mock.calls.map((call) => {
+  return spy.mock.calls.map((call: unknown[]) => {
     const line = String(call[0]);
     const parsed = JSON.parse(line) as { event: string; payload: Record<string, unknown> };
     return { event: parsed.event, payload: parsed.payload };
@@ -28,8 +28,14 @@ describe("core API routes observability", () => {
   });
 
   it("wraps auth/login and profile routes with api_request logging + correlation id", async () => {
-    vi.mocked(login).mockResolvedValue({ status: 200, body: { ok: true } });
-    vi.mocked(updateProfile).mockResolvedValue({ status: 200, body: { ok: true } });
+    vi.mocked(login).mockResolvedValue({
+      status: 200,
+      body: { token: "token-1", user: { id: "user-1", email: "user@example.com" } },
+    });
+    vi.mocked(updateProfile).mockResolvedValue({
+      status: 200,
+      body: { profile: { timezone: "UTC", units: "metric", dailyCalorieGoal: 2200 } },
+    });
 
     const infoSpy = vi.spyOn(console, "info").mockImplementation(() => undefined);
 
@@ -68,7 +74,7 @@ describe("core API routes observability", () => {
   it("emits sign_up analytics on live /api/auth/signup endpoint (deduped by idempotency key)", async () => {
     vi.mocked(signup).mockResolvedValue({
       status: 201,
-      body: { user: { id: "user-1", email: "user@example.com" } },
+      body: { token: "token-1", user: { id: "user-1", email: "user@example.com" } },
     });
 
     const infoSpy = vi.spyOn(console, "info").mockImplementation(() => undefined);
