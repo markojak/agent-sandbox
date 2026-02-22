@@ -73,6 +73,55 @@ describe("materializeDailyRollups", () => {
     expect(updatedDay?.totalCalories).toBe(2200);
   });
 
+  it("ignores entries from other users when materializing a user partition", () => {
+    const mixedEntries: FoodEntry[] = [
+      ...entries,
+      { id: "foreign-1", userId: "user-2", calories: 5000, consumedAt: "2026-02-15T12:00:00.000Z" },
+      { id: "foreign-2", userId: "user-2", calories: 6000, consumedAt: "2026-02-16T12:00:00.000Z" },
+    ];
+
+    const result = materializeDailyRollups({
+      userId: "user-1",
+      profile,
+      entries: mixedEntries,
+      startDate: "2026-02-15",
+      endDate: "2026-02-21",
+    });
+
+    const dayOne = result.rollups.find((item) => item.date === "2026-02-15");
+    const dayTwo = result.rollups.find((item) => item.date === "2026-02-16");
+
+    expect(dayOne?.totalCalories).toBe(1900);
+    expect(dayTwo?.totalCalories).toBe(1800);
+  });
+
+  it("meets MVP latency target for rollup materialization on expected dataset", () => {
+    const sampleEntries: FoodEntry[] = [];
+
+    for (let day = 0; day < 30; day += 1) {
+      for (let index = 0; index < 8; index += 1) {
+        sampleEntries.push({
+          id: `entry-${day}-${index}`,
+          userId: "user-1",
+          calories: 300 + ((day + index) % 7) * 50,
+          consumedAt: `2026-01-${String(day + 1).padStart(2, "0")}T12:00:00.000Z`,
+        });
+      }
+    }
+
+    const started = performance.now();
+    materializeDailyRollups({
+      userId: "user-1",
+      profile,
+      entries: sampleEntries,
+      startDate: "2026-01-01",
+      endDate: "2026-01-30",
+    });
+    const elapsedMs = performance.now() - started;
+
+    expect(elapsedMs).toBeLessThan(100);
+  });
+
   it("matches raw entry aggregate totals per user-date", () => {
     const result = materializeDailyRollups({
       userId: "user-1",

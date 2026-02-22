@@ -18,24 +18,42 @@ if (!databaseUrl) {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const sqlPath = path.join(
-  __dirname,
-  "..",
-  "db",
-  "migrations",
-  `001_auth_profile_${direction}.sql`,
-);
+const migrationsDir = path.join(__dirname, "..", "db", "migrations");
 
-const sql = await fs.readFile(sqlPath, "utf8");
+async function listMigrationSqlPaths(targetDirection) {
+  const entries = await fs.readdir(migrationsDir);
+  const suffix = `_${targetDirection}.sql`;
+
+  const files = entries
+    .filter((fileName) => /^\d+_.+_(up|down)\.sql$/.test(fileName))
+    .filter((fileName) => fileName.endsWith(suffix))
+    .sort((a, b) => a.localeCompare(b, "en"));
+
+  if (targetDirection === "down") {
+    files.reverse();
+  }
+
+  return files.map((fileName) => path.join(migrationsDir, fileName));
+}
+
+const sqlPaths = await listMigrationSqlPaths(direction);
+if (sqlPaths.length === 0) {
+  throw new Error(`No migration files found for direction=${direction}`);
+}
+
 const client = new Client({ connectionString: databaseUrl });
 
 await client.connect();
 await client.query("BEGIN");
 
 try {
-  await client.query(sql);
+  for (const sqlPath of sqlPaths) {
+    const sql = await fs.readFile(sqlPath, "utf8");
+    await client.query(sql);
+  }
+
   await client.query("COMMIT");
-  console.log(`migration ${direction} applied`);
+  console.log(`migration ${direction} applied (${sqlPaths.length} files)`);
 } catch (error) {
   await client.query("ROLLBACK");
   throw error;

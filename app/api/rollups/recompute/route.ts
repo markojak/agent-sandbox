@@ -29,6 +29,14 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
+  if (body.profile.userId !== body.userId) {
+    return Response.json({ error: "profile.userId must match userId" }, { status: 400 });
+  }
+
+  if (body.entries.some((entry) => entry.userId !== body.userId)) {
+    return Response.json({ error: "entries must only include the requested userId" }, { status: 400 });
+  }
+
   const result = materializeDailyRollups({
     userId: body.userId,
     profile: body.profile,

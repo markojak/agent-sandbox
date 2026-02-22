@@ -12,10 +12,18 @@ function indexRollups(rollups: DailyRollup[]): Map<DateKey, DailyRollup> {
   return new Map(rollups.map((rollup) => [rollup.date, rollup]));
 }
 
-function aggregateTotalsByDate(entries: FoodEntry[], timeZone: string): Map<DateKey, { totalCalories: number; entryCount: number }> {
+function aggregateTotalsByDate(
+  entries: FoodEntry[],
+  userId: string,
+  timeZone: string,
+): Map<DateKey, { totalCalories: number; entryCount: number }> {
   const totals = new Map<DateKey, { totalCalories: number; entryCount: number }>();
 
   for (const entry of entries) {
+    if (entry.userId !== userId) {
+      continue;
+    }
+
     const date = toDateKey(entry.consumedAt, timeZone);
     const current = totals.get(date) ?? { totalCalories: 0, entryCount: 0 };
 
@@ -55,7 +63,7 @@ export function materializeDailyRollups(params: MaterializeRollupsParams): Mater
   const { userId, profile, entries, existingRollups = [], startDate, endDate, changedEntryDates } = params;
 
   const recomputedRange = computeRecomputeRange(startDate, endDate, changedEntryDates);
-  const totalsByDate = aggregateTotalsByDate(entries, profile.timeZone);
+  const totalsByDate = aggregateTotalsByDate(entries, userId, profile.timeZone);
   const existingByDate = indexRollups(existingRollups.filter((rollup) => rollup.userId === userId));
 
   const recomputeDates = eachDate(recomputedRange.startDate, recomputedRange.endDate);
