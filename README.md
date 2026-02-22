@@ -84,6 +84,17 @@ npm run test:e2e
 npm run test:perf
 ```
 
+## Deployment hardening (MVP)
+
+- Environment contract: copy [`.env.example`](.env.example) and fill required values.
+- Run fail-fast env validation: `npm run env:check`
+- Health endpoint: `GET /api/health`
+- Migration checks/deploy scripts:
+  - `npm run migrate:check -- --dry-run`
+  - `npm run migrate:deploy`
+- Full runbook: [`docs/deployment-runbook.md`](docs/deployment-runbook.md)
+- Dependency audit baseline: [`docs/security-audit.md`](docs/security-audit.md)
+
 ## Documentation
 
 - Product overview: [`docs/product-overview.md`](docs/product-overview.md)

@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: test
+      AUTH_SECRET: "12345678901234567890123456789012"
+      DATABASE_URL: "postgresql://user:pass@localhost:5432/db"
+      LOG_INGEST_TOKEN: "1234567890123456"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate environment contract
+        run: npm run env:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+
+      - name: Migration dry-run check
+        run: npm run migrate:check -- --dry-run
+
+      - name: Dependency audit (non-blocking; tracked via issue)
+        continue-on-error: true
+        run: npm audit --audit-level=high
