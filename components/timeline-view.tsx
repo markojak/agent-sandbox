@@ -9,10 +9,6 @@ import type { FoodEntry } from "@/lib/calorie-types";
 import { getDailySummary } from "@/lib/daily-summary";
 import { buildTrendSeries, formatReadableDate, getDateKey } from "@/lib/trends";
 
-function parseDateKey(dateKey: string) {
-  return new Date(`${dateKey}T12:00:00.000Z`);
-}
-
 export function TimelineView({ initialGoal, timezone }: { initialGoal: number; timezone: string }) {
   const [entries, setEntries] = useState<FoodEntry[]>([]);
   const [calorieGoal, setCalorieGoal] = useState(initialGoal);
@@ -22,10 +18,9 @@ export function TimelineView({ initialGoal, timezone }: { initialGoal: number; t
     fetchPersistedEntries().then(setEntries);
   }, []);
 
-  const selectedDate = useMemo(() => parseDateKey(selectedDateKey), [selectedDateKey]);
   const summary = useMemo(
-    () => getDailySummary(entries, timezone, selectedDate, calorieGoal),
-    [entries, timezone, selectedDate, calorieGoal],
+    () => getDailySummary(entries, timezone, selectedDateKey, calorieGoal),
+    [entries, timezone, selectedDateKey, calorieGoal],
   );
 
   const entriesForSelectedDate = useMemo(
@@ -33,8 +28,14 @@ export function TimelineView({ initialGoal, timezone }: { initialGoal: number; t
     [entries, selectedDateKey, timezone],
   );
 
-  const trend7 = useMemo(() => buildTrendSeries(entries, timezone, 7, selectedDate), [entries, timezone, selectedDate]);
-  const trend30 = useMemo(() => buildTrendSeries(entries, timezone, 30, selectedDate), [entries, timezone, selectedDate]);
+  const trend7 = useMemo(
+    () => buildTrendSeries(entries, timezone, 7, selectedDateKey),
+    [entries, timezone, selectedDateKey],
+  );
+  const trend30 = useMemo(
+    () => buildTrendSeries(entries, timezone, 30, selectedDateKey),
+    [entries, timezone, selectedDateKey],
+  );
 
   return (
     <div className="min-h-screen bg-zinc-50 p-6">

@@ -1,6 +1,5 @@
 import type { DailyTotal, FoodEntry } from "@/lib/calorie-types";
 
-const DAY = 24 * 60 * 60 * 1000;
 const trendCache = new Map<string, { expiresAt: number; data: DailyTotal[] }>();
 
 export function getDateKey(date: Date, timezone: string): string {
@@ -12,27 +11,48 @@ export function getDateKey(date: Date, timezone: string): string {
   }).format(date);
 }
 
-export function formatReadableDate(dateKey: string, timezone: string): string {
-  const date = new Date(`${dateKey}T12:00:00.000Z`);
-  return new Intl.DateTimeFormat("en-US", {
-    timeZone: timezone,
-    month: "short",
-    day: "numeric",
-  }).format(date);
+function toUtcDateFromKey(dateKey: string): Date {
+  return new Date(`${dateKey}T00:00:00.000Z`);
 }
 
-function listDateKeys(windowDays: number, endDate: Date, timezone: string): string[] {
+function shiftDateKey(dateKey: string, offsetDays: number): string {
+  const date = toUtcDateFromKey(dateKey);
+  date.setUTCDate(date.getUTCDate() + offsetDays);
+  return date.toISOString().slice(0, 10);
+}
+
+function resolveDateKey(value: Date | string, timezone: string): string {
+  return typeof value === "string" ? value : getDateKey(value, timezone);
+}
+
+export function formatReadableDate(dateKey: string, timezone: string): string {
+  void timezone;
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "UTC",
+    month: "short",
+    day: "numeric",
+  }).format(toUtcDateFromKey(dateKey));
+}
+
+function listDateKeys(windowDays: number, endDateKey: string): string[] {
   const keys: string[] = [];
 
   for (let i = windowDays - 1; i >= 0; i -= 1) {
-    keys.push(getDateKey(new Date(endDate.getTime() - i * DAY), timezone));
+    keys.push(shiftDateKey(endDateKey, -i));
   }
 
   return keys;
 }
 
-function buildCacheKey(entries: FoodEntry[], windowDays: number, endDate: Date, timezone: string): string {
-  return `${entries.length}:${windowDays}:${getDateKey(endDate, timezone)}:${timezone}`;
+function buildEntriesFingerprint(entries: FoodEntry[]): string {
+  return entries
+    .map((entry) => `${entry.id}:${entry.consumedAt}:${entry.calories}:${entry.mealName}`)
+    .sort()
+    .join("|");
+}
+
+function buildCacheKey(entries: FoodEntry[], windowDays: number, endDateKey: string, timezone: string): string {
+  return `${windowDays}:${endDateKey}:${timezone}:${buildEntriesFingerprint(entries)}`;
 }
 
 export function aggregateDailyTotals(entries: FoodEntry[], timezone: string): Map<string, DailyTotal> {
@@ -65,9 +85,10 @@ export function buildTrendSeries(
   entries: FoodEntry[],
   timezone: string,
   windowDays: 7 | 30,
-  endDate = new Date(),
+  endDate: Date | string = new Date(),
 ): DailyTotal[] {
-  const cacheKey = buildCacheKey(entries, windowDays, endDate, timezone);
+  const endDateKey = resolveDateKey(endDate, timezone);
+  const cacheKey = buildCacheKey(entries, windowDays, endDateKey, timezone);
   const cached = trendCache.get(cacheKey);
 
   if (cached && cached.expiresAt > Date.now()) {
@@ -75,7 +96,7 @@ export function buildTrendSeries(
   }
 
   const totalsByDate = aggregateDailyTotals(entries, timezone);
-  const timeline = listDateKeys(windowDays, endDate, timezone).map((date) => {
+  const timeline = listDateKeys(windowDays, endDateKey).map((date) => {
     const existing = totalsByDate.get(date);
     return (
       existing ?? {

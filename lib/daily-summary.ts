@@ -1,8 +1,8 @@
 import type { FoodEntry } from "@/lib/calorie-types";
 import { aggregateDailyTotals, getDateKey } from "@/lib/trends";
 
-export function getDailySummary(entries: FoodEntry[], timezone: string, selectedDate: Date, calorieGoal: number) {
-  const dateKey = getDateKey(selectedDate, timezone);
+export function getDailySummary(entries: FoodEntry[], timezone: string, selectedDate: Date | string, calorieGoal: number) {
+  const dateKey = typeof selectedDate === "string" ? selectedDate : getDateKey(selectedDate, timezone);
   const totals = aggregateDailyTotals(entries, timezone).get(dateKey);
   const totalCalories = totals?.totalCalories ?? 0;
   const delta = calorieGoal - totalCalories;
