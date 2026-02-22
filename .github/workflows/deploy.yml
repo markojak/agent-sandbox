@@ -31,6 +31,7 @@ jobs:
           npm run env:check
           npm run lint
           npm run test
+          npm run test -- tests/middleware.test.ts tests/health.test.ts
           npm run build
           npm run migrate:check -- --dry-run
 
@@ -64,6 +65,7 @@ jobs:
           npm run env:check
           npm run lint
           npm run test
+          npm run test -- tests/middleware.test.ts tests/health.test.ts
           npm run build
           npm run migrate:check -- --dry-run
 

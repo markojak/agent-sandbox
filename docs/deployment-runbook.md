@@ -43,10 +43,13 @@ npm run migrate:check -- --dry-run
 npm run migrate:deploy
 ```
 
+`migrate:deploy` applies only forward migrations and records each applied file in `schema_migrations`.
+Rollback/down scripts are excluded from forward deploys.
+
 ### Rollback guidance
 
 1. Revert application deployment to previous release.
-2. If backward-incompatible migration was applied, execute a pre-authored rollback SQL script for the affected migration (store alongside each migration as `*_rollback.sql`).
+2. If backward-incompatible migration was applied, execute a pre-authored rollback SQL script for the affected migration (store alongside each migration as `*_down.sql` or `*_rollback.sql`).
 3. Re-run health checks:
 
 ```bash
@@ -58,8 +61,8 @@ curl -f https://<env>/api/health
 ## Health checks and monitoring
 
 - Endpoint: `GET /api/health`
-- Returns `200` + `status=ok` when app/dependency checks are ready.
-- Returns `503` + `status=degraded` with misconfiguration details when not ready.
+- Returns `200` + `status=ok` when app/dependency checks are ready (including live DB connectivity).
+- Returns `503` + `status=degraded` with misconfiguration/dependency details when not ready.
 
 Recommended uptime monitor: poll `/api/health` every 60s with 2-failure alert threshold.
 
