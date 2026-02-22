@@ -15,7 +15,11 @@
     "test:unit": "node --test tests/unit/*.test.mjs",
     "test:integration": "node --test tests/integration/*.test.mjs",
     "test:e2e": "node tests/e2e/auth-profile-smoke.mjs",
-    "test:perf": "node tests/perf/auth-profile-p95.mjs"
+    "test:perf": "node tests/perf/auth-profile-p95.mjs",
+    "test:unit:vitest": "vitest run tests/unit",
+    "test:integration:vitest": "vitest run tests/integration",
+    "test:e2e:vitest": "vitest run tests/e2e",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "next": "16.1.6",
@@ -28,6 +32,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",

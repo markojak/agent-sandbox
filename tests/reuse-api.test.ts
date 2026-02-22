@@ -20,51 +20,77 @@ const req = (url: string, userId: string, init?: RequestInit) =>
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const ensureResponse = (response: Response | undefined, label: string): Response => {
+  if (!response) {
+    throw new Error(`${label} did not return a response`);
+  }
+
+  return response;
+};
+
 describe("favorites, recents, and duplicate flow APIs", () => {
   beforeEach(() => {
     resetStore();
   });
 
   it("favorites CRUD is user-scoped and blocks cross-user access", async () => {
-    const entryResponse = await postEntries(
-      req("http://localhost/api/entries", "user-a", {
-        method: "POST",
-        body: JSON.stringify({
-          mealName: "Chicken bowl",
-          calories: 700,
-          quantity: "1 bowl",
-          mealTime: "lunch",
+    const entryResponse = ensureResponse(
+      await postEntries(
+        req("http://localhost/api/entries", "user-a", {
+          method: "POST",
+          body: JSON.stringify({
+            mealName: "Chicken bowl",
+            calories: 700,
+            quantity: "1 bowl",
+            mealTime: "lunch",
+          }),
         }),
-      }),
+      ),
+      "POST /api/entries",
     );
     expect(entryResponse.status).toBe(201);
     const createdEntry = (await entryResponse.json()).entry;
 
-    const favoriteResponse = await postFavorites(
-      req("http://localhost/api/favorites", "user-a", {
-        method: "POST",
-        body: JSON.stringify({ entryId: createdEntry.id }),
-      }),
+    const favoriteResponse = ensureResponse(
+      await postFavorites(
+        req("http://localhost/api/favorites", "user-a", {
+          method: "POST",
+          body: JSON.stringify({ entryId: createdEntry.id }),
+        }),
+      ),
+      "POST /api/favorites",
     );
     expect(favoriteResponse.status).toBe(201);
     const createdFavorite = (await favoriteResponse.json()).favorite;
 
-    const userAFavorites = await getFavorites(req("http://localhost/api/favorites", "user-a"));
+    const userAFavorites = ensureResponse(
+      await getFavorites(req("http://localhost/api/favorites", "user-a")),
+      "GET /api/favorites user-a",
+    );
     expect(userAFavorites.status).toBe(200);
     expect((await userAFavorites.json()).favorites.length).toBe(1);
 
-    const userBFavorites = await getFavorites(req("http://localhost/api/favorites", "user-b"));
+    const userBFavorites = ensureResponse(
+      await getFavorites(req("http://localhost/api/favorites", "user-b")),
+      "GET /api/favorites user-b",
+    );
     expect(userBFavorites.status).toBe(200);
     expect((await userBFavorites.json()).favorites.length).toBe(0);
 
-    const crossUserDelete = await deleteFavorite(req("http://localhost/api/favorites/id", "user-b"), {
-      params: Promise.resolve({ favoriteId: createdFavorite.id }),
-    });
+    const crossUserDelete = ensureResponse(
+      await deleteFavorite(req("http://localhost/api/favorites/id", "user-b"), {
+        params: Promise.resolve({ favoriteId: createdFavorite.id }),
+      }),
+      "DELETE /api/favorites/[favoriteId] cross-user",
+    );
     expect(crossUserDelete.status).toBe(404);
 
-    const ownerDelete = await deleteFavorite(req("http://localhost/api/favorites/id", "user-a"), {
-      params: Promise.resolve({ favoriteId: createdFavorite.id }),
-    });
+    const ownerDelete = ensureResponse(
+      await deleteFavorite(req("http://localhost/api/favorites/id", "user-a"), {
+        params: Promise.resolve({ favoriteId: createdFavorite.id }),
+      }),
+      "DELETE /api/favorites/[favoriteId] owner",
+    );
     expect(ownerDelete.status).toBe(204);
   });
 
@@ -109,7 +135,10 @@ describe("favorites, recents, and duplicate flow APIs", () => {
       }),
     );
 
-    const recentsResponse = await getRecents(req("http://localhost/api/recents", "user-a"));
+    const recentsResponse = ensureResponse(
+      await getRecents(req("http://localhost/api/recents", "user-a")),
+      "GET /api/recents",
+    );
     expect(recentsResponse.status).toBe(200);
 
     const recents = (await recentsResponse.json()).recents;
@@ -119,24 +148,30 @@ describe("favorites, recents, and duplicate flow APIs", () => {
   });
 
   it("reuse actions emit telemetry events for favorite/recent/duplicate", async () => {
-    const entryResponse = await postEntries(
-      req("http://localhost/api/entries", "user-a", {
-        method: "POST",
-        body: JSON.stringify({
-          mealName: "Turkey wrap",
-          calories: 540,
-          quantity: "1 wrap",
-          mealTime: "lunch",
+    const entryResponse = ensureResponse(
+      await postEntries(
+        req("http://localhost/api/entries", "user-a", {
+          method: "POST",
+          body: JSON.stringify({
+            mealName: "Turkey wrap",
+            calories: 540,
+            quantity: "1 wrap",
+            mealTime: "lunch",
+          }),
         }),
-      }),
+      ),
+      "POST /api/entries source",
     );
     const sourceEntry = (await entryResponse.json()).entry;
 
-    const favoriteResponse = await postFavorites(
-      req("http://localhost/api/favorites", "user-a", {
-        method: "POST",
-        body: JSON.stringify({ entryId: sourceEntry.id }),
-      }),
+    const favoriteResponse = ensureResponse(
+      await postFavorites(
+        req("http://localhost/api/favorites", "user-a", {
+          method: "POST",
+          body: JSON.stringify({ entryId: sourceEntry.id }),
+        }),
+      ),
+      "POST /api/favorites source",
     );
     const favorite = (await favoriteResponse.json()).favorite;
 
@@ -180,7 +215,10 @@ describe("favorites, recents, and duplicate flow APIs", () => {
       },
     );
 
-    const telemetryResponse = await getTelemetry(req("http://localhost/api/telemetry", "user-a"));
+    const telemetryResponse = ensureResponse(
+      await getTelemetry(req("http://localhost/api/telemetry", "user-a")),
+      "GET /api/telemetry",
+    );
     const events = (await telemetryResponse.json()).events.map((event: { type: string }) => event.type);
 
     expect(events).toContain("favorite_added");
@@ -191,7 +229,10 @@ describe("favorites, recents, and duplicate flow APIs", () => {
   });
 
   it("all APIs require authenticated user header", async () => {
-    const response = await getEntries(new Request("http://localhost/api/entries"));
+    const response = ensureResponse(
+      await getEntries(new Request("http://localhost/api/entries")),
+      "GET /api/entries unauthenticated",
+    );
     expect(response.status).toBe(401);
   });
 });
