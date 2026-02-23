@@ -26,7 +26,7 @@ describe("favorites, recents, and duplicate flow APIs", () => {
   });
 
   it("favorites CRUD is user-scoped and blocks cross-user access", async () => {
-    const entryResponse = await postEntries(
+    const entryResponse = (await postEntries(
       req("http://localhost/api/entries", "user-a", {
         method: "POST",
         body: JSON.stringify({
@@ -36,35 +36,35 @@ describe("favorites, recents, and duplicate flow APIs", () => {
           mealTime: "lunch",
         }),
       }),
-    );
+    ))!;
     expect(entryResponse.status).toBe(201);
     const createdEntry = (await entryResponse.json()).entry;
 
-    const favoriteResponse = await postFavorites(
+    const favoriteResponse = (await postFavorites(
       req("http://localhost/api/favorites", "user-a", {
         method: "POST",
         body: JSON.stringify({ entryId: createdEntry.id }),
       }),
-    );
+    ))!;
     expect(favoriteResponse.status).toBe(201);
     const createdFavorite = (await favoriteResponse.json()).favorite;
 
-    const userAFavorites = await getFavorites(req("http://localhost/api/favorites", "user-a"));
+    const userAFavorites = (await getFavorites(req("http://localhost/api/favorites", "user-a")))!;
     expect(userAFavorites.status).toBe(200);
     expect((await userAFavorites.json()).favorites.length).toBe(1);
 
-    const userBFavorites = await getFavorites(req("http://localhost/api/favorites", "user-b"));
+    const userBFavorites = (await getFavorites(req("http://localhost/api/favorites", "user-b")))!;
     expect(userBFavorites.status).toBe(200);
     expect((await userBFavorites.json()).favorites.length).toBe(0);
 
-    const crossUserDelete = await deleteFavorite(req("http://localhost/api/favorites/id", "user-b"), {
+    const crossUserDelete = (await deleteFavorite(req("http://localhost/api/favorites/id", "user-b"), {
       params: Promise.resolve({ favoriteId: createdFavorite.id }),
-    });
+    }))!;
     expect(crossUserDelete.status).toBe(404);
 
-    const ownerDelete = await deleteFavorite(req("http://localhost/api/favorites/id", "user-a"), {
+    const ownerDelete = (await deleteFavorite(req("http://localhost/api/favorites/id", "user-a"), {
       params: Promise.resolve({ favoriteId: createdFavorite.id }),
-    });
+    }))!;
     expect(ownerDelete.status).toBe(204);
   });
 
@@ -109,7 +109,7 @@ describe("favorites, recents, and duplicate flow APIs", () => {
       }),
     );
 
-    const recentsResponse = await getRecents(req("http://localhost/api/recents", "user-a"));
+    const recentsResponse = (await getRecents(req("http://localhost/api/recents", "user-a")))!;
     expect(recentsResponse.status).toBe(200);
 
     const recents = (await recentsResponse.json()).recents;
@@ -118,8 +118,54 @@ describe("favorites, recents, and duplicate flow APIs", () => {
     expect(recents[1].mealName).toBe("Salad");
   });
 
+  it("recents clamps negative offset query values to 0", async () => {
+    await postEntries(
+      req("http://localhost/api/entries", "user-a", {
+        method: "POST",
+        body: JSON.stringify({
+          mealName: "Oats",
+          calories: 350,
+          quantity: "1 bowl",
+          mealTime: "breakfast",
+        }),
+      }),
+    );
+
+    await sleep(5);
+
+    await postEntries(
+      req("http://localhost/api/entries", "user-a", {
+        method: "POST",
+        body: JSON.stringify({
+          mealName: "Salad",
+          calories: 420,
+          quantity: "1 plate",
+          mealTime: "lunch",
+        }),
+      }),
+    );
+
+    const minusOneResponse = (await getRecents(
+      req("http://localhost/api/recents?limit=1&offset=-1", "user-a"),
+    ))!;
+    expect(minusOneResponse.status).toBe(200);
+
+    const minusOneRecents = (await minusOneResponse.json()).recents;
+    expect(minusOneRecents).toHaveLength(1);
+    expect(minusOneRecents[0].mealName).toBe("Salad");
+
+    const largeNegativeResponse = (await getRecents(
+      req("http://localhost/api/recents?limit=1&offset=-999", "user-a"),
+    ))!;
+    expect(largeNegativeResponse.status).toBe(200);
+
+    const largeNegativeRecents = (await largeNegativeResponse.json()).recents;
+    expect(largeNegativeRecents).toHaveLength(1);
+    expect(largeNegativeRecents[0].mealName).toBe("Salad");
+  });
+
   it("reuse actions emit telemetry events for favorite/recent/duplicate", async () => {
-    const entryResponse = await postEntries(
+    const entryResponse = (await postEntries(
       req("http://localhost/api/entries", "user-a", {
         method: "POST",
         body: JSON.stringify({
@@ -129,15 +175,15 @@ describe("favorites, recents, and duplicate flow APIs", () => {
           mealTime: "lunch",
         }),
       }),
-    );
+    ))!;
     const sourceEntry = (await entryResponse.json()).entry;
 
-    const favoriteResponse = await postFavorites(
+    const favoriteResponse = (await postFavorites(
       req("http://localhost/api/favorites", "user-a", {
         method: "POST",
         body: JSON.stringify({ entryId: sourceEntry.id }),
       }),
-    );
+    ))!;
     const favorite = (await favoriteResponse.json()).favorite;
 
     await postEntries(
@@ -180,7 +226,7 @@ describe("favorites, recents, and duplicate flow APIs", () => {
       },
     );
 
-    const telemetryResponse = await getTelemetry(req("http://localhost/api/telemetry", "user-a"));
+    const telemetryResponse = (await getTelemetry(req("http://localhost/api/telemetry", "user-a")))!;
     const events = (await telemetryResponse.json()).events.map((event: { type: string }) => event.type);
 
     expect(events).toContain("favorite_added");
@@ -191,7 +237,7 @@ describe("favorites, recents, and duplicate flow APIs", () => {
   });
 
   it("all APIs require authenticated user header", async () => {
-    const response = await getEntries(new Request("http://localhost/api/entries"));
+    const response = (await getEntries(new Request("http://localhost/api/entries")))!;
     expect(response.status).toBe(401);
   });
 });
