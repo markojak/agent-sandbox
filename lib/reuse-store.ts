@@ -184,7 +184,7 @@ export const listFavorites = (userId: string) => {
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 };
 
-export const listRecents = (userId: string, limit = 5) => {
+export const listRecents = (userId: string, limit = 5, offset = 0) => {
   const latestByMeal = new Map<string, Entry>();
 
   for (const entry of listEntries(userId)) {
@@ -196,7 +196,7 @@ export const listRecents = (userId: string, limit = 5) => {
 
   return [...latestByMeal.values()]
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-    .slice(0, limit);
+    .slice(offset, offset + limit);
 };
 
 export const listTelemetryEvents = (userId: string) => {

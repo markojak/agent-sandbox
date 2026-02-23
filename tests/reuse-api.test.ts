@@ -118,6 +118,52 @@ describe("favorites, recents, and duplicate flow APIs", () => {
     expect(recents[1].mealName).toBe("Salad");
   });
 
+  it("recents clamps negative offset query values to 0", async () => {
+    await postEntries(
+      req("http://localhost/api/entries", "user-a", {
+        method: "POST",
+        body: JSON.stringify({
+          mealName: "Oats",
+          calories: 350,
+          quantity: "1 bowl",
+          mealTime: "breakfast",
+        }),
+      }),
+    );
+
+    await sleep(5);
+
+    await postEntries(
+      req("http://localhost/api/entries", "user-a", {
+        method: "POST",
+        body: JSON.stringify({
+          mealName: "Salad",
+          calories: 420,
+          quantity: "1 plate",
+          mealTime: "lunch",
+        }),
+      }),
+    );
+
+    const minusOneResponse = await getRecents(
+      req("http://localhost/api/recents?limit=1&offset=-1", "user-a"),
+    );
+    expect(minusOneResponse.status).toBe(200);
+
+    const minusOneRecents = (await minusOneResponse.json()).recents;
+    expect(minusOneRecents).toHaveLength(1);
+    expect(minusOneRecents[0].mealName).toBe("Salad");
+
+    const largeNegativeResponse = await getRecents(
+      req("http://localhost/api/recents?limit=1&offset=-999", "user-a"),
+    );
+    expect(largeNegativeResponse.status).toBe(200);
+
+    const largeNegativeRecents = (await largeNegativeResponse.json()).recents;
+    expect(largeNegativeRecents).toHaveLength(1);
+    expect(largeNegativeRecents[0].mealName).toBe("Salad");
+  });
+
   it("reuse actions emit telemetry events for favorite/recent/duplicate", async () => {
     const entryResponse = await postEntries(
       req("http://localhost/api/entries", "user-a", {
