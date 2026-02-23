@@ -118,6 +118,33 @@ describe("favorites, recents, and duplicate flow APIs", () => {
     expect(recents[1].mealName).toBe("Salad");
   });
 
+  it("recents falls back to default limit when query limit is invalid", async () => {
+    const meals = ["Oats", "Salad", "Soup"];
+
+    for (const meal of meals) {
+      await postEntries(
+        req("http://localhost/api/entries", "user-a", {
+          method: "POST",
+          body: JSON.stringify({
+            mealName: meal,
+            calories: 400,
+            quantity: "1 serving",
+            mealTime: "lunch",
+          }),
+        }),
+      );
+      await sleep(5);
+    }
+
+    const recentsResponse = await getRecents(
+      req("http://localhost/api/recents?limit=-1", "user-a"),
+    );
+
+    expect(recentsResponse.status).toBe(200);
+    const recents = (await recentsResponse.json()).recents;
+    expect(recents.length).toBe(3);
+  });
+
   it("reuse actions emit telemetry events for favorite/recent/duplicate", async () => {
     const entryResponse = await postEntries(
       req("http://localhost/api/entries", "user-a", {

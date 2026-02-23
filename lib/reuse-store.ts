@@ -47,6 +47,8 @@ export type EntryInput = {
   notes?: string;
 };
 
+export const DEFAULT_LIMIT = 5;
+
 const state = {
   entries: [] as Entry[],
   favorites: [] as FavoriteFood[],
@@ -184,7 +186,7 @@ export const listFavorites = (userId: string) => {
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 };
 
-export const listRecents = (userId: string, limit = 5) => {
+export const listRecents = (userId: string, limit = DEFAULT_LIMIT) => {
   const latestByMeal = new Map<string, Entry>();
 
   for (const entry of listEntries(userId)) {

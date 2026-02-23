@@ -1,6 +1,20 @@
 import { requireUserId } from "@/lib/request-user";
-import { listRecents } from "@/lib/reuse-store";
+import { DEFAULT_LIMIT, listRecents } from "@/lib/reuse-store";
 import { NextResponse } from "next/server";
+
+const getRecentLimit = (request: Request) => {
+  const limitParam = new URL(request.url).searchParams.get("limit");
+  if (!limitParam) {
+    return DEFAULT_LIMIT;
+  }
+
+  const parsed = Number.parseInt(limitParam, 10);
+  if (Number.isNaN(parsed) || parsed <= 0) {
+    return DEFAULT_LIMIT;
+  }
+
+  return parsed;
+};
 
 export async function GET(request: Request) {
   const auth = requireUserId(request);
@@ -8,10 +22,7 @@ export async function GET(request: Request) {
     return auth.response;
   }
 
-  const limitParam = new URL(request.url).searchParams.get("limit");
-  const limit = limitParam ? Number(limitParam) : 5;
-
   return NextResponse.json({
-    recents: listRecents(auth.userId, Number.isFinite(limit) ? limit : 5),
+    recents: listRecents(auth.userId, getRecentLimit(request)),
   });
 }
