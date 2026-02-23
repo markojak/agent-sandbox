@@ -1,0 +1,1 @@
+strict anti loop guard works
