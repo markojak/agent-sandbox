@@ -142,11 +142,11 @@ describe("favorites, recents, and duplicate flow APIs", () => {
     const defaultRecents = (await defaultResponse.json()).recents;
     expect(defaultRecents.length).toBe(meals.length);
 
-    const invalidLimits = ["-1", "0", "NaN"];
+    const invalidLimits = ["-1", "0", "NaN", "abc", "", "   "];
 
     for (const limit of invalidLimits) {
       const recentsResponse = await getRecents(
-        req(`http://localhost/api/recents?limit=${limit}`, "user-a"),
+        req(`http://localhost/api/recents?limit=${encodeURIComponent(limit)}`, "user-a"),
       );
 
       expect(recentsResponse.status).toBe(200);

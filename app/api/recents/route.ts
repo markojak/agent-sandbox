@@ -8,7 +8,12 @@ const getRecentLimit = (request: Request) => {
     return DEFAULT_LIMIT;
   }
 
-  const parsed = Number.parseInt(limitParam, 10);
+  const trimmed = limitParam.trim();
+  if (!trimmed) {
+    return DEFAULT_LIMIT;
+  }
+
+  const parsed = Number.parseInt(trimmed, 10);
   if (Number.isNaN(parsed) || parsed <= 0) {
     return DEFAULT_LIMIT;
   }
