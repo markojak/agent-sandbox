@@ -136,13 +136,24 @@ describe("favorites, recents, and duplicate flow APIs", () => {
       await sleep(5);
     }
 
-    const recentsResponse = await getRecents(
-      req("http://localhost/api/recents?limit=-1", "user-a"),
-    );
+    const defaultResponse = await getRecents(req("http://localhost/api/recents", "user-a"));
 
-    expect(recentsResponse.status).toBe(200);
-    const recents = (await recentsResponse.json()).recents;
-    expect(recents.length).toBe(3);
+    expect(defaultResponse.status).toBe(200);
+    const defaultRecents = (await defaultResponse.json()).recents;
+    expect(defaultRecents.length).toBe(meals.length);
+
+    const invalidLimits = ["-1", "0", "NaN"];
+
+    for (const limit of invalidLimits) {
+      const recentsResponse = await getRecents(
+        req(`http://localhost/api/recents?limit=${limit}`, "user-a"),
+      );
+
+      expect(recentsResponse.status).toBe(200);
+      const recents = (await recentsResponse.json()).recents;
+      expect(recents.length).toBe(defaultRecents.length);
+      expect(recents).toEqual(defaultRecents);
+    }
   });
 
   it("reuse actions emit telemetry events for favorite/recent/duplicate", async () => {
