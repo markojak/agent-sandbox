@@ -1,13 +1,14 @@
 # Shard Orchestration Smoke Test
 
 ## Purpose
-The shard orchestration smoke test is a lightweight check that keeps the distributed test infrastructure honest. Running through the smoke flow verifies that our `vitest` setup, CLI runners, and shard-aware helpers start up cleanly. It also gives humans a regular reminder of which commands signal that the orchestration layer is still wired up.
+Issue #54 asked for a quick smoke reference that keeps the shard-aware Vitest CLI in the open. This page explains why we run the light check and where to look when the orchestration layer needs reassurance.
 
 ## How to verify locally
-1. Install dependencies (`npm install`) and make sure your working tree is clean so the smoke test can point to a known baseline.
-2. Execute `npm run test -- --help`. The script resolves to `vitest run --help`, so it must print the full list of flags, including `--shard <shards>` and other shard orchestration knobs. Seeing that output confirms that a developer shell can resolve the test scripts and that the shard options are still surfaced to the CLI.
-3. Observe the command exits with `0` and no errors in the help text. That exit code means the smoke test can reach the orchestration layer without touching any real test suites, and the help text ensures the `shard`-related arguments remain discoverable.
+1. Ensure dependencies are installed (`npm install`) and your working tree is clean so the smoke entry point has a known baseline.
+2. Run `npm run test -- --help`. The script resolves to `vitest run --help`, so its output should start with the familiar `vitest/4.0.18` banner and enumerate options such as `--shard <shards>`, `--run`, and `--watch`. Seeing `--shard <shards>` in that list proves the shard hooks are exposed to CLI consumers without actually executing suites.
+3. Confirm the command exits with `0` and prints no errors. A clean help output means the CLI layer boots and lists the shard controls while leaving the real suites untouched.
 
 ## What changed
-- Added this smoke test reference page so anyone touching CI, local automation, or shard orchestration knows why and how to run the check.
-- Call out the `npm run test -- --help` command to document the exact trigger that proves the runner bootstraps and exposes the shard options.
+- Added this issue #54–driven reference page so the smoke test has a discoverable home.
+- Linked the new guide from the README documentation list so the smoke path is easy to find.
+- Documented that the verification step is `npm run test -- --help`, and that it surfaces the `vitest run` help text with the shard options we care about.

@@ -90,5 +90,5 @@ npm run test:perf
 - Observability queries: [`docs/auth-profile-observability.md`](docs/auth-profile-observability.md)
 - M1 release checklist: [`docs/m1-release-checklist.md`](docs/m1-release-checklist.md)
 - Reuse API & telemetry: [`docs/reuse-api.md`](docs/reuse-api.md)
-- Shard orchestration smoke test guide: [`docs/shard-orchestration-smoke.md`](docs/shard-orchestration-smoke.md)
+- Shard orchestration smoke test guide: [`docs/shard-orchestration-smoke.md`](docs/shard-orchestration-smoke.md) (issue #54) – describes how running `npm run test -- --help` proves the shard-aware Vitest CLI is still reachable.
 - Vision source of truth: [`VISION.md`](VISION.md)
