@@ -34,7 +34,7 @@ await client.connect();
 try {
   runMigrate("up");
 
-  for (const tableName of ["users", "profiles", "auth_sessions"]) {
+  for (const tableName of ["users", "profiles", "auth_sessions", "daily_rollups"]) {
     if (!(await tableExists(client, tableName))) {
       throw new Error(`expected table ${tableName} after up migration`);
     }
@@ -42,7 +42,7 @@ try {
 
   runMigrate("down");
 
-  for (const tableName of ["users", "profiles", "auth_sessions"]) {
+  for (const tableName of ["users", "profiles", "auth_sessions", "daily_rollups"]) {
     if (await tableExists(client, tableName)) {
       throw new Error(`table ${tableName} should be dropped by down migration`);
     }
