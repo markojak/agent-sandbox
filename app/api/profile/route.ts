@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
 import { updateProfile } from "@/lib/server/auth-profile-service.mjs";
+import { withObservedRoute } from "@/lib/observability/route";
 
-export async function PATCH(request: Request) {
+export const PATCH = withObservedRoute(async (request) => {
   const authorization = request.headers.get("authorization") ?? "";
   const token = authorization.startsWith("Bearer ")
     ? authorization.replace("Bearer ", "")
@@ -10,5 +10,5 @@ export async function PATCH(request: Request) {
   const body = await request.json();
   const result = await updateProfile(token, body);
 
-  return NextResponse.json(result.body, { status: result.status });
-}
+  return Response.json(result.body, { status: result.status });
+});

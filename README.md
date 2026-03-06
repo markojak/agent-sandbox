@@ -87,6 +87,7 @@ npm run test:perf
 ## Documentation
 
 - Product overview: [`docs/product-overview.md`](docs/product-overview.md)
+- Observability runbook: [`docs/observability-runbook.md`](docs/observability-runbook.md)
 - Observability queries: [`docs/auth-profile-observability.md`](docs/auth-profile-observability.md)
 - M1 release checklist: [`docs/m1-release-checklist.md`](docs/m1-release-checklist.md)
 - Vision source of truth: [`VISION.md`](VISION.md)
